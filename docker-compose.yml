@@ -1,4 +1,18 @@
 services:
+
+  postgres:
+    image: postgres:14.2
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth-postgres-data:/var/lib/postgresql/data/
+    deploy:
+      mode: replicated
+      replicas: 1
+
   broker-service:
     build:
       context: ./broker-service
@@ -10,15 +24,18 @@ services:
       mode: replicated
       replicas: 1
 
-  postgres:
-    image: postgres:16
+  authentication-service:
+    build:
+      context: ./authentication-service
+      dockerfile: authentication-service.dockerfile
     restart: always
     ports:
-      - "5432:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-
-
+      - "8081:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+    depends_on:
+      - postgres
 
 volumes:
-  postgres-data:
+  auth-postgres-data:

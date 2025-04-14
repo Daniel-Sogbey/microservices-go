@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	_ "github.com/lib/pq"
 	"log"
 	"net/http"
 	"os"
@@ -60,7 +61,7 @@ func openDB(dsn string) (*sql.DB, error) {
 }
 
 func connectToDB() *sql.DB {
-	dsn := os.Getenv("AUTH_MICRO_DSN")
+	dsn := os.Getenv("AUTHENTICATION_DB_DSN")
 
 	for {
 		connection, err := openDB(dsn)
