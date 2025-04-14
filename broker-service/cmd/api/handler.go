@@ -11,5 +11,4 @@ func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_ = app.writeJson(w, http.StatusOK, payload)
-
 }
