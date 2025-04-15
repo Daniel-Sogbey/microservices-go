@@ -61,7 +61,7 @@ func openDB(dsn string) (*sql.DB, error) {
 }
 
 func connectToDB() *sql.DB {
-	dsn := os.Getenv("AUTHENTICATION_DB_DSN")
+	dsn := os.Getenv("AUTH_DB_DSN")
 
 	for {
 		connection, err := openDB(dsn)
@@ -70,6 +70,7 @@ func connectToDB() *sql.DB {
 			counts++
 		} else {
 			log.Println("connected to Postgres!")
+			fmt.Println("AUTH_DB_DSN: ", dsn)
 			return connection
 		}
 
