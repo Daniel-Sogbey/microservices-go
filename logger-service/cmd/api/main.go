@@ -14,7 +14,7 @@ import (
 const (
 	webPort  = "80"
 	rpcPort  = "5001"
-	mongoURL = "mongodb://localhost:27017"
+	mongoURL = "mongodb://mongo:27017"
 	gRpcPort = "50001"
 )
 
@@ -58,7 +58,7 @@ func (app *Config) serve() {
 		Handler: app.route(),
 	}
 
-	log.Println("Starting logger service on port 80")
+	log.Println("Starting logger service on port", webPort)
 	log.Fatal(srv.ListenAndServe())
 }
 

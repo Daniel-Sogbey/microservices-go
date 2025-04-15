@@ -6,7 +6,7 @@ COPY . .
 
 RUN GOOS=linux CGO_ENABLED=0 go build -o authApp ./cmd/api
 
-RUN chmod +x authApp
+RUN chmod +x /app/authApp
 
 FROM alpine:latest
 
