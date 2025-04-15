@@ -13,6 +13,17 @@ services:
       mode: replicated
       replicas: 1
 
+  mongo:
+    image: mongo:4.2.16-bionic
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INIT_DB_DATABASE: logs
+      MONGO_INIT_DB_ROOT_USERNAME: admin
+      MONGO_INIT_DB_ROOT_PASSWORD: password
+    volumes:
+      - log-mongo-data:/data/db
+
   broker-service:
     build:
       context: ./broker-service
@@ -41,3 +52,4 @@ services:
 
 volumes:
   auth-postgres-data:
+  log-mongo-data:

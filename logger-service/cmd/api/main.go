@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"log-service/data"
+	"net/http"
 	"time"
 )
 
@@ -18,6 +21,7 @@ const (
 var client *mongo.Client
 
 type Config struct {
+	Models data.Models
 }
 
 func main() {
@@ -40,6 +44,22 @@ func main() {
 		}
 	}(client)
 
+	app := Config{
+		Models: data.New(client),
+	}
+
+	//start web server
+	app.serve()
+}
+
+func (app *Config) serve() {
+	srv := http.Server{
+		Addr:    fmt.Sprintf(":%s", webPort),
+		Handler: app.route(),
+	}
+
+	log.Println("Starting logger service on port 80")
+	log.Fatal(srv.ListenAndServe())
 }
 
 func connectToMongo() (*mongo.Client, error) {
