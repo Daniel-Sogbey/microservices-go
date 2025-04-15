@@ -67,7 +67,12 @@ func (l *LogEntry) All(filter Filter) ([]*LogEntry, error) {
 		return nil, err
 	}
 
-	defer cursor.Close(ctx)
+	defer func(cursor *mongo.Cursor, ctx context.Context) {
+		err := cursor.Close(ctx)
+		if err != nil {
+
+		}
+	}(cursor, ctx)
 
 	var logs []*LogEntry
 
@@ -134,10 +139,10 @@ func (l *LogEntry) Update() (*mongo.UpdateResult, error) {
 		bson.D{
 			{
 				"$set", bson.D{
-				{"name", l.Name},
-				{"data", l.Data},
-				{"updated_at", time.Now().UTC()},
-			},
+					{"name", l.Name},
+					{"data", l.Data},
+					{"updated_at", time.Now().UTC()},
+				},
 			},
 		},
 	)
