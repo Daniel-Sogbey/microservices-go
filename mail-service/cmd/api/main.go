@@ -1,6 +1,10 @@
 package main
 
-import "log"
+import (
+	"fmt"
+	"log"
+	"net/http"
+)
 
 type Config struct {
 }
@@ -13,4 +17,10 @@ func main() {
 
 	log.Println("Starting mail service on port", webPort)
 
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%s", webPort),
+		Handler: app.routes(),
+	}
+
+	log.Fatal(srv.ListenAndServe())
 }
