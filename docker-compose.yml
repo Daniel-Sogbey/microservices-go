@@ -18,11 +18,17 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INIT_DB_DATABASE: logs
-      MONGO_INIT_DB_ROOT_USERNAME: admin
-      MONGO_INIT_DB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: logs
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
     volumes:
       - log-mongo-data:/data/db
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - "1025:1025"
+      - "8025:8025"
 
   broker-service:
     build:
@@ -49,6 +55,7 @@ services:
       replicas: 1
     depends_on:
       - postgres
+      - mongo
 
   logger-service:
     build:
