@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/vanng822/go-premailer/premailer"
 	mail "github.com/xhit/go-simple-mail/v2"
 	"html/template"
@@ -66,6 +67,7 @@ func (m *Mail) SendSMTPMessage(msg Message) error {
 
 	smtpClient, err := server.Connect()
 	if err != nil {
+		fmt.Println("ERROR CONNECT:", err)
 		return err
 	}
 
@@ -104,7 +106,7 @@ func (m *Mail) getEncryption(s string) mail.Encryption {
 func (m *Mail) buildPlainTextMessage(msg Message) (string, error) {
 	templateToRender := "./templates/mail.plain.gohtml"
 
-	t, err := template.New("email-plain").Parse(templateToRender)
+	t, err := template.ParseFiles(templateToRender)
 	if err != nil {
 		return "", err
 	}
@@ -123,7 +125,7 @@ func (m *Mail) buildPlainTextMessage(msg Message) (string, error) {
 func (m *Mail) buildHTMLMessage(msg Message) (string, error) {
 	templateToRender := "./templates/mail.html.gohtml"
 
-	t, err := template.New("email-html").Parse(templateToRender)
+	t, err := template.ParseFiles(templateToRender)
 	if err != nil {
 		return "", err
 	}

@@ -30,6 +30,16 @@ services:
       - "1025:1025"
       - "8025:8025"
 
+  rabbitmq:
+    image: rabbitmq:3.13.7-alpine
+    ports:
+      - "5672:5672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    deploy:
+      mode: replicated
+      replicas: 1
+
   broker-service:
     build:
       context: ./broker-service
@@ -61,12 +71,25 @@ services:
     build:
       context: ./logger-service
       dockerfile: logger-service.dockerfile
+    restart: always
     deploy:
       mode: replicated
       replicas: 1
     depends_on:
       - mongo
 
+  mail-service:
+    build:
+      context: ./mail-service
+      dockerfile: mail-service.dockerfile
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    env_file:
+      - .env
+
 volumes:
   auth-postgres-data:
   log-mongo-data:
+  rabbitmq-data:
