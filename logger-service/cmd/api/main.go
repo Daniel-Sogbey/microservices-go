@@ -31,6 +31,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	log.Println("connected to mongodb!")
+
 	client = mongoClient
 
 	//create a context in order to disconnect

@@ -14,3 +14,14 @@ func declareExchange(ch *amqp.Channel) error {
 		false,
 		nil)
 }
+
+func declareRandomQueue(ch *amqp.Channel) (amqp.Queue, error) {
+	return ch.QueueDeclare(
+		"",
+		false,
+		false,
+		true,
+		false,
+		nil,
+	)
+}
