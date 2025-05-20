@@ -1,4 +1,4 @@
-FROM golang:1.24-alphine AS builder
+FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ RUN GOOS=linux CGO_ENABLED=0 go build -o listenerApp .
 
 RUN chmod +x /app/listenerApp
 
-FROM alphine:latest
+FROM alpine:latest
 
 WORKDIR /app
 
