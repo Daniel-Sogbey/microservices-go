@@ -2,10 +2,14 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	amqp "github.com/rabbitmq/amqp091-go"
+	"log"
 	"net/http"
+	"time"
 )
 
 type RequestPayload struct {
@@ -54,7 +58,7 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	case "auth":
 		app.authenticate(w, requestPayload.Auth)
 	case "log":
-		app.logItem(w, requestPayload.Log)
+		app.logItemToQueue(w, requestPayload.Log, "log.INFO")
 	case "mail":
 		app.sendMail(w, requestPayload.Mail)
 	default:
@@ -144,6 +148,55 @@ func (app *Config) logItem(w http.ResponseWriter, entry LogPayload) {
 
 	_ = app.writeJson(w, http.StatusAccepted, payload)
 
+}
+
+func (app *Config) logItemToQueue(w http.ResponseWriter, entry LogPayload, severity string) {
+	jsonData, _ := json.Marshal(&entry)
+
+	channel, err := app.conn.Channel()
+	if err != nil {
+		log.Fatal("failed to setup a channel")
+	}
+
+	defer channel.Close()
+
+	err = channel.ExchangeDeclare(
+		"logs_topic",
+		"topic",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+
+	if err != nil {
+		log.Fatal("failed to declare exchange")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	err = channel.PublishWithContext(
+		ctx,
+		"logs_topic",
+		severity,
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "application/json",
+			Body:        jsonData,
+		},
+	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var payload jsonResponse
+	payload.Error = false
+	payload.Message = "logged via RabbitMQ"
+
+	_ = app.writeJson(w, http.StatusAccepted, payload)
 }
 
 func (app *Config) sendMail(w http.ResponseWriter, msg MailPayload) {
